@@ -28,7 +28,14 @@ header { background: var(--ink); color: white; padding: var(--space-4) 3vw; disp
 header label { font-size: .875rem; display: flex; align-items: center; gap: var(--space-2); }
 header select { font-size: .875rem; }
 .brand { display: flex; align-items: center; gap: var(--space-2); color: white; text-decoration: none; font-size: 1.5rem; font-weight: 650; letter-spacing: -.04em; }
-.brand span { display: grid; place-items: center; border: 1px solid #82909B; border-radius: 5px; font-size: 1rem; width: 1.8rem; height: 1.8rem; }
+.brand-mark { width: 2.75rem; height: 2.75rem; flex: none; overflow: visible; }
+.brand-tile { fill: #263747; stroke: #637789; stroke-width: 1; }
+.brand-route, .brand-link { fill: none; stroke: #F3F5F6; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.brand-route-back { stroke: #91A5B5; stroke-width: 1.6; }
+.brand-link { stroke: var(--accent); stroke-width: 3; }
+.brand-node { fill: var(--accent); stroke: var(--ink); stroke-width: 1.5; }
+.brand-wordmark { font-size: 1.6rem; font-weight: 700; letter-spacing: -.055em; }
+.brand-sync { font-weight: 400; color: #D9E4EC; }
 .header-caption { color: #C8D2DA; margin-right: auto; font-size: .875rem; }
 main { max-width: 1520px; margin: auto; padding: var(--space-6) 3vw var(--space-4); }
 .heading, .bar, .panel-heading, .record-heading, footer { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
