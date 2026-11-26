@@ -1,0 +1,17 @@
+{
+  "name": "utilisync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A local, fictional municipal utility coordination demo",
+  "scripts": {
+    "test": "node --test tests/requests.test.cjs",
+    "test:browser": "node --test tests/browser.test.cjs",
+    "check": "node --check demo.js && node --check requests.js && node --check map.js && node --check app.js"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

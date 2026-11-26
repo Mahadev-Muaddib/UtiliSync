@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UtiliSync · Ward workspace</title><link rel="stylesheet" href="theme.css"></head>
+<body><header><strong>◈ UtiliSync</strong><label>Demo area <select id="area"></select></label><label>Demo role <select id="role"><option>Agency planner</option><option>Coordinator</option></select></label></header>
+<main><section class="heading"><div><small>MUNICIPAL WORKSPACE</small><h1 id="title"></h1></div><button id="new">＋ New dig request</button></section>
+<p id="notice" role="status" hidden></p>
+<div class="workspace"><section class="atlas"><div class="bar"><b>Street map</b><span>Fictional schematic · N ↑</span></div><svg id="map" viewBox="0 0 640 360" aria-label="Selectable street schematic"></svg><div class="bar layers" id="layers"></div></section>
+<aside><label for="search">Find a street or request</label><input id="search" type="search" placeholder="Street name, purpose or ID"><div id="results"></div></aside></div>
+<section id="details" aria-live="polite" tabindex="-1"></section><footer>Illustrative data · Street layouts and underground utilities are invented. <button id="reset" class="plain">Reset demo</button></footer></main>
+<dialog id="dialog" aria-labelledby="request-title"><form id="form"><h2 id="request-title">New dig request</h2><fieldset><legend>Street segments</legend><div id="choices"></div></fieldset><label>Purpose <input name="purpose" required maxlength="120"></label><label>Start date <input name="start" type="date" required></label><label>End date <input name="end" type="date" required></label><p id="warnings" class="warnings" aria-live="polite"></p><button type="button" id="cancel" class="plain">Cancel</button> <button>Submit request</button></form></dialog>
+<script defer src="demo.js"></script><script defer src="requests.js"></script><script defer src="map.js"></script><script defer src="app.js"></script></body></html>
