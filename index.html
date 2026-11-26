@@ -1,10 +1,56 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UtiliSync · Ward workspace</title><link rel="stylesheet" href="theme.css"></head>
-<body><header><strong>◈ UtiliSync</strong><label>Demo area <select id="area"></select></label><label>Demo role <select id="role"><option>Agency planner</option><option>Coordinator</option></select></label></header>
-<main><section class="heading"><div><small>MUNICIPAL WORKSPACE</small><h1 id="title"></h1></div><button id="new">＋ New dig request</button></section>
-<p id="notice" role="status" hidden></p>
-<div class="workspace"><section class="atlas"><div class="bar"><b>Street map</b><span>Fictional schematic · N ↑</span></div><svg id="map" viewBox="0 0 640 360" aria-label="Selectable street schematic"></svg><div class="bar layers" id="layers"></div></section>
-<aside><label for="search">Find a street or request</label><input id="search" type="search" placeholder="Street name, purpose or ID"><div id="results"></div></aside></div>
-<section id="details" aria-live="polite" tabindex="-1"></section><footer>Illustrative data · Street layouts and underground utilities are invented. <button id="reset" class="plain">Reset demo</button></footer></main>
-<dialog id="dialog" aria-labelledby="request-title"><form id="form"><h2 id="request-title">New dig request</h2><fieldset><legend>Street segments</legend><div id="choices"></div></fieldset><label>Purpose <input name="purpose" required maxlength="120"></label><label>Start date <input name="start" type="date" required></label><label>End date <input name="end" type="date" required></label><p id="warnings" class="warnings" aria-live="polite"></p><button type="button" id="cancel" class="plain">Cancel</button> <button>Submit request</button></form></dialog>
-<script defer src="demo.js"></script><script defer src="requests.js"></script><script defer src="map.js"></script><script defer src="app.js"></script></body></html>
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UtiliSync · Street coordination</title><link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<header>
+  <a class="brand" href="index.html" aria-label="UtiliSync home"><span aria-hidden="true">U</span> UtiliSync</a>
+  <span class="header-caption">Shared utility registry</span>
+  <label>Demo area <select id="area"></select></label>
+  <label>Demo role <select id="role"><option>Agency planner</option><option>Coordinator</option></select></label>
+</header>
+<main>
+  <section class="heading"><div><small>MUNICIPAL WORKSPACE</small><h1 id="title"></h1>
+    <p>Find a street. Check the ground. Coordinate the next dig.</p></div>
+    <button id="new" class="primary">New dig request</button>
+  </section>
+  <div class="demo-note"><strong>Simulated survey</strong><span>All layouts, depths, agencies and work records are fictional. Snapshot: <time id="snapshot"></time>.</span></div>
+  <p id="notice" role="status" hidden></p><p id="status" class="sr-only" role="status"></p>
+  <div class="workspace">
+    <aside class="registry" aria-labelledby="registry-title">
+      <div class="panel-heading"><h2 id="registry-title">Street registry</h2><span id="street-count" class="count"></span></div>
+      <label for="search">Find a street</label><input id="search" type="search" placeholder="Street, agency or request ID">
+      <div id="results"></div><p class="registry-note">Select a row or a map segment to open its street record.</p>
+    </aside>
+    <section class="atlas" aria-labelledby="map-title">
+      <div class="bar"><h2 id="map-title">Street map</h2><span>Schematic · not to scale · N ↑</span></div>
+      <svg id="map" viewBox="0 0 640 360" aria-label="Selectable street schematic"></svg>
+      <div class="bar layers" id="layers" role="group" aria-label="Visible utility layers"></div>
+      <div class="map-caption"><span class="selection-key"></span><span id="map-selected"></span></div>
+    </section>
+  </div>
+  <div id="record-home"><section id="details" tabindex="-1" aria-labelledby="street-title"></section></div>
+  <footer><span>UtiliSync / Local coordination demo · Changes are saved in this browser.</span><button id="reset" class="plain">Reset demo</button></footer>
+</main>
+<dialog id="street-sheet" aria-labelledby="street-title"></dialog>
+<dialog id="dialog" aria-labelledby="request-title">
+  <form id="form">
+    <small>PLAN TOGETHER</small><h2 id="request-title">New dig request</h2><p id="draft-area" class="muted"></p>
+    <label>Agency <select name="agency" required><option value="">Choose a demo agency</option></select></label>
+    <fieldset><legend>Street segments</legend><div id="choices"></div></fieldset>
+    <label>Purpose <input name="purpose" required maxlength="120" placeholder="What work needs to happen?"></label>
+    <div class="date-fields"><label>Start date <input name="start" type="date" required></label><label>End date <input name="end" type="date" required></label></div>
+    <div id="warnings" aria-live="polite"></div>
+    <p class="form-note">Warnings are advisory. A coordinator reviews every submitted request.</p>
+    <div class="dialog-actions"><button type="button" id="cancel">Cancel</button><button class="primary">Submit request</button></div>
+  </form>
+</dialog>
+<dialog id="review-dialog" aria-labelledby="review-title">
+  <div id="review-content" tabindex="-1"></div>
+  <div class="dialog-actions"><button id="review-close">Return to street</button></div>
+</dialog>
+<script defer src="demo.js"></script><script defer src="requests.js"></script><script defer src="map.js"></script><script defer src="app.js"></script>
+</body>
+</html>

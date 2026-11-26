@@ -100,3 +100,56 @@ test('empty, invalid, and reversed dates do not produce misleading warnings', ()
     assert.deepEqual(warnings(start, end, seeds), []);
   }
 });
+
+test('agency validation accepts legacy records and rejects malformed agency values', () => {
+  const legacy = { ...first }; delete legacy.agency;
+  assert.ok(isValidRequest(legacy));
+  assert.equal(context.agencyName(legacy), 'Agency unrecorded');
+  for (const agency of [null, {}, '', '   ', 'x'.repeat(101)]) assert.equal(isValidRequest({ ...first, agency }), false);
+  assert.ok(isValidRequest({ ...first, agency: 'Another demo agency' }));
+});
+
+test('structured overlaps identify each shared street, agency, request and actual intersection', () => {
+  const other = { ...first, streets: ['Market Road', 'Edakulangara'] };
+  const details = context.conflictDetails(first.area, other.streets, '2026-12-04', '2026-12-10', [other]);
+  const overlaps = Array.from(details).filter(item => item.kind === 'overlap');
+  assert.equal(overlaps.length, 2);
+  for (const warning of overlaps) {
+    assert.equal(warning.requestId, first.id); assert.equal(warning.agency, first.agency);
+    assert.equal(warning.start, '2026-12-04'); assert.equal(warning.end, '2026-12-08');
+  }
+  assert.deepEqual(overlaps.map(item => item.street), ['Market Road', 'Edakulangara']);
+  const resurfacing = Array.from(details).find(item => item.kind === 'resurfacing');
+  assert.equal(resurfacing.street, 'Market Road'); assert.equal(resurfacing.date, '2026-11-12');
+});
+
+test('street counts treat duplicate utility types as individual lines and reflect review changes', () => {
+  const street = JSON.parse(vm.runInContext('JSON.stringify(areas.Karunagappally[0])', context));
+  const extra = { ...first, id: 'DG-103', agency: 'Coastal Telecom (demo)' };
+  const records = [first, extra];
+  let summary = context.streetSummary(first.area, street, records);
+  assert.equal(summary.lineCount, 3); assert.equal(summary.pending, 2); assert.equal(summary.flagged, true);
+  extra.status = 'Approved';
+  summary = context.streetSummary(first.area, street, records);
+  assert.equal(summary.pending, 1); assert.equal(summary.approved, 1); assert.equal(summary.flagged, true);
+  extra.status = 'Rejected';
+  summary = context.streetSummary(first.area, street, records);
+  assert.equal(summary.pending, 1); assert.equal(summary.approved, 0); assert.equal(summary.flagged, false);
+});
+
+test('activity uses completed dated events over a calendar-year boundary, never approvals or future events', () => {
+  const street = JSON.parse(vm.runInContext('JSON.stringify(areas.Karunagappally[0])', context));
+  street.events.push({ date: '2026-11-30', type: 'excavation' }, { date: '2026-12-02', type: 'excavation' });
+  const months = Array.from(context.activityMonths(street));
+  assert.equal(months.length, 12); assert.equal(months[0].key, '2025-12'); assert.equal(months[11].key, '2026-11');
+  assert.deepEqual(months.filter(month => month.events.length).map(month => month.key), ['2026-02', '2026-04', '2026-09', '2026-11']);
+  assert.equal(months[11].events.length, 1);
+  assert.equal(context.completedEvents(street).length, 4);
+  const approved = { ...first, status: 'Approved' };
+  context.streetSummary(first.area, street, [approved]);
+  assert.equal(context.completedEvents(street).length, 4);
+});
+
+test('recent excavation without resurfacing does not adopt the reference prototype warning rule', () => {
+  assert.deepEqual(Array.from(conflicts('Karunagappally', ['Lalaji Junction'], '2026-12-01', '2026-12-04', [])), []);
+});
