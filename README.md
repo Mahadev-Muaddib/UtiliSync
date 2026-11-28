@@ -23,3 +23,15 @@ The app removes only reserved seed IDs `DG-101` and `DG-102`, or rows explicitly
 - `npm run test:browser`: Playwright checks the normal entry point, both municipalities, details, filters, source failures, optional layers, storage migration and mobile layout. Use `BROWSER_CHANNEL=msedge` for installed Edge if Chromium is unavailable. Tests intercept responses in isolated browser contexts; the source JSON is never modified. Screenshots are saved under ignored `test-results/`.
 
 `data.js` owns validation/adaptation and storage migration; `app.js` renders source evidence; `map.js` draws geographical points/optional geometry; `server.cjs` serves only application assets and optional GeoJSON. Update `project_data.json` to replace the snapshot without embedding or duplicating it in JavaScript.
+
+## Optional BETA dig-request playground
+
+Expand **BETA · Dig-request playground** at the bottom of the page. The main source registry, map and counts remain separate from this simulation. Leaflet 1.9.4 is installed with `npm install` / `npm ci` and served locally; its JavaScript and CSS load only when the panel is opened. OpenStreetMap background tiles require an internet connection and display their attribution. Tile failures leave coordinate selection and mock testing available.
+
+- Click a map location to fill latitude and longitude, or enter coordinates directly.
+- Blue source markers open record details and use the supplied coordinate order correctly (JSON longitude/latitude becomes Leaflet latitude/longitude). Choose a reference landmark as a keyboard alternative; **Open full source details** opens the original evidence card. Only records with source coordinates receive markers. Project snapshots without coordinates stay unplaced.
+- Enter a test agency, purpose, dates and a 10–500 metre test radius; select **Submit mock request**. Requests appear as labelled fictional circles and cards. **Add example overlap** creates two explicitly fictional requests at the draft location (or an available source reference point).
+- Overlap checks compare intersecting circles and inclusive date ranges. Approval retains advisory overlaps; rejected mock requests are excluded. These rules do not establish real excavation safety, routes or permissions.
+- **Clear all test requests** affects only the playground. All BETA requests are held in memory and disappear on page reload; real data, persisted user requests and settings are never changed.
+
+Implementation: `beta.js` owns the isolated UI/map/session; `beta-logic.js` owns validation and simulated overlap rules. Browser tests cover coordinate selection, source-marker details, mock review/reset, lazy loading, unavailable tiles/assets, mobile layout, and source-count/storage isolation. Tests abort external tile requests to avoid relying on or loading the public tile service during automated runs.
