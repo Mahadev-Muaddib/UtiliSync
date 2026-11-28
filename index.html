@@ -1,65 +1,26 @@
 ﻿<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>UtiliSync · Street coordination</title><link rel="stylesheet" href="theme.css">
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UtiliSync · Municipal evidence</title><link rel="stylesheet" href="theme.css"></head>
 <body>
-<header>
-  <a class="brand" href="index.html" aria-label="UtiliSync home">
-    <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-      <path class="brand-tile" d="M24 3 44 14.5v19L24 45 4 33.5v-19Z"/>
-      <path class="brand-route brand-route-back" d="m12 17 12 7 12-7M24 24v14"/>
-      <path class="brand-route" d="M12 17v12l12 7 12-7V17"/>
-      <path class="brand-link" d="m12 17 12-7 12 7-12 7Z"/>
-      <circle class="brand-node" cx="24" cy="24" r="4"/>
-    </svg>
-    <span class="brand-wordmark">Utili<span class="brand-sync">Sync</span></span>
-  </a>
-  <span class="header-caption">Shared utility registry</span>
-  <label>Demo area <select id="area"></select></label>
-  <label>Demo role <select id="role"><option>Agency planner</option><option>Coordinator</option></select></label>
-</header>
+<header><a class="brand" href="index.html"><span class="brand-wordmark">Utili<span class="brand-sync">Sync</span></span></a><span class="header-caption">Municipal works & maintenance</span><label>Municipality <select id="area"><option value="all">Both municipalities</option><option value="karunagappally">Karunagappally</option><option value="kollam">Kollam</option></select></label></header>
 <main>
-  <section class="heading"><div><small>MUNICIPAL WORKSPACE</small><h1 id="title"></h1>
-    <p>Find a street. Check the ground. Coordinate the next dig.</p></div>
-    <button id="new" class="primary">New dig request</button>
-  </section>
-  <div class="demo-note"><strong>Simulated survey</strong><span>All layouts, depths, agencies and work records are fictional. Snapshot: <time id="snapshot"></time>.</span></div>
-  <p id="notice" role="status" hidden></p><p id="status" class="sr-only" role="status"></p>
-  <div class="workspace">
-    <aside class="registry" aria-labelledby="registry-title">
-      <div class="panel-heading"><h2 id="registry-title">Street registry</h2><span id="street-count" class="count"></span></div>
-      <label for="search">Find a street</label><input id="search" type="search" placeholder="Street, agency or request ID">
-      <div id="results"></div><p class="registry-note">Select a row or a map segment to open its street record.</p>
-    </aside>
-    <section class="atlas" aria-labelledby="map-title">
-      <div class="bar"><h2 id="map-title">Street map</h2><span>Schematic · not to scale · N ↑</span></div>
-      <svg id="map" viewBox="0 0 640 360" aria-label="Selectable street schematic"></svg>
-      <div class="bar layers" id="layers" role="group" aria-label="Visible utility layers"></div>
-      <div class="map-caption"><span class="selection-key"></span><span id="map-selected"></span></div>
-    </section>
-  </div>
-  <div id="record-home"><section id="details" tabindex="-1" aria-labelledby="street-title"></section></div>
-  <footer><span>UtiliSync / Local coordination demo · Changes are saved in this browser.</span><button id="reset" class="plain">Reset demo</button></footer>
-</main>
-<dialog id="street-sheet" aria-labelledby="street-title"></dialog>
-<dialog id="dialog" aria-labelledby="request-title">
-  <form id="form">
-    <small>PLAN TOGETHER</small><h2 id="request-title">New dig request</h2><p id="draft-area" class="muted"></p>
-    <label>Agency <select name="agency" required><option value="">Choose a demo agency</option></select></label>
-    <fieldset><legend>Street segments</legend><div id="choices"></div></fieldset>
-    <label>Purpose <input name="purpose" required maxlength="120" placeholder="What work needs to happen?"></label>
-    <div class="date-fields"><label>Start date <input name="start" type="date" required></label><label>End date <input name="end" type="date" required></label></div>
-    <div id="warnings" aria-live="polite"></div>
-    <p class="form-note">Warnings are advisory. A coordinator reviews every submitted request.</p>
-    <div class="dialog-actions"><button type="button" id="cancel">Cancel</button><button class="primary">Submit request</button></div>
-  </form>
-</dialog>
-<dialog id="review-dialog" aria-labelledby="review-title">
-  <div id="review-content" tabindex="-1"></div>
-  <div class="dialog-actions"><button id="review-close">Return to street</button></div>
-</dialog>
-<script defer src="demo.js"></script><script defer src="requests.js"></script><script defer src="map.js"></script><script defer src="app.js"></script>
-</body>
-</html>
+<section class="heading"><div><small>MUNICIPAL WORKSPACE</small><h1 id="title">Works, grounded in evidence.</h1><p>Explore maintenance locations, project snapshots and documented relationships.</p></div><div class="snapshot">SOURCE SNAPSHOT<br><strong id="snapshot">Loading…</strong></div></section>
+<p id="notice" role="status" hidden></p><p id="error" role="alert" hidden></p><p id="status" class="sr-only" role="status"></p>
+<div id="loading">Loading project_data.json…</div>
+<div id="content" hidden>
+<p id="scope" class="source-note"></p>
+<section id="stats" class="stats" aria-label="Source record counts"></section>
+<div class="filters"><label>Search records <input id="search" type="search" placeholder="Landmark, ID, agency or work"></label><label>Record type <select id="kind"><option value="all">All source records</option><option value="maintenance_incidents">Maintenance incidents</option><option value="water_projects">Water projects</option><option value="official_work_observations">Official work observations</option></select></label><label>Reported status <select id="record-status"><option value="all">All statuses</option></select></label><button id="clear">Clear filters</button></div>
+<div class="workspace">
+<aside class="registry"><div class="panel-heading"><h2>Record registry</h2><span id="record-count" class="count"></span></div><div id="results"></div><p class="registry-note">Select a source record to inspect its dates, evidence and quality flags.</p></aside>
+<section class="atlas" aria-labelledby="map-title"><div class="bar"><div><h2 id="map-title">Maintenance locations</h2><span class="muted">Source-reported points · north up</span></div><button id="fit-map">Fit points</button></div><svg id="map" viewBox="0 0 800 460" role="group" aria-label="Maintenance points plotted by longitude and latitude"></svg><div class="map-caption" id="map-summary"></div><p class="map-note"><span class="map-key"></span> Within source boundary check <span class="map-key exception"></span> Boundary exception · unverified locations</p><p class="map-note">No pipe routes or road joins are inferred. Projects without coordinates remain in the registry.</p><details class="layer-panel"><summary>Optional map layers</summary><div id="layers"></div></details></section>
+</div>
+<section id="details" tabindex="-1" aria-label="Selected source record"><p class="empty">Select a record or a map point to inspect the source.</p></section>
+<section class="analytics"><article class="chart-panel"><h2>Maintenance activity</h2><p class="muted">Last 12 snapshot months · complaint and closure dates, not excavation</p><div id="activity"></div></article><article class="chart-panel"><h2>Water project progress</h2><p class="muted">Reported snapshots · unknown progress stays unknown</p><div id="progress"></div></article></section>
+<section class="chart-panel"><h2>Documented dependencies</h2><p class="muted">Prerequisite → dependent · historical planning evidence, not spatial overlap</p><div id="dependencies"></div></section>
+<section class="chart-panel"><h2>Featured evidence</h2><div id="featured" class="featured-grid"></div></section>
+<section class="chart-panel"><h2>Preserved local requests</h2><p class="muted">User-created records from the previous app are kept separately from the source dataset. There is no verified street network for new dig scheduling.</p><div id="local-requests"></div></section>
+<footer>UtiliSync / Source evidence workspace · Unknown dates, routes and costs are never inferred.</footer>
+</div>
+</main><script defer src="data.js"></script><script defer src="map.js"></script><script defer src="app.js"></script>
+</body></html>

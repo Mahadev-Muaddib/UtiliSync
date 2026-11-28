@@ -1,4 +1,4 @@
-const assert = require('node:assert/strict');
+﻿const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const { test } = require('node:test');
@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const context = vm.createContext({});
 for (const file of ['demo.js', 'requests.js']) {
-  vm.runInContext(readFileSync(path.join(__dirname, '..', file), 'utf8'), context, { filename: file });
+  vm.runInContext(readFileSync(path.join(__dirname, 'fixtures', file), 'utf8'), context, { filename: file });
 }
 const { isValidDate, isValidRequest, parseRequests, nextRequestId, conflicts } = context;
 const seeds = JSON.parse(vm.runInContext('JSON.stringify(seedRequests)', context));
@@ -153,3 +153,4 @@ test('activity uses completed dated events over a calendar-year boundary, never 
 test('recent excavation without resurfacing does not adopt the reference prototype warning rule', () => {
   assert.deepEqual(Array.from(conflicts('Karunagappally', ['Lalaji Junction'], '2026-12-01', '2026-12-04', [])), []);
 });
+

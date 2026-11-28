@@ -1,60 +1,25 @@
 ﻿# UtiliSync
 
-Open `index.html` in a modern browser. The workspace uses local HTML, CSS and JavaScript, with no installation or build step. Both Karunagappally and Kollam are available from the area selector.
+UtiliSync displays the local `project_data.json` snapshot for Karunagappally and Kollam. Run `npm start` (or `npm.cmd start` in PowerShell) and open http://127.0.0.1:4173. Node.js 20+ is required. No build or external map service is required. The server resolves files from its own project root, independent of the working directory. Direct `file://` startup cannot fetch JSON in modern browsers and displays instructions to use the server.
 
-## Demonstrate coordination
+## Source workspace
 
-1. Select **Market Road** in the registry or map. Its record shows three individual utility lines, their demo owners and depths, completed work, and planned requests. The two telecom cables count separately.
-2. Read the **12 November 2026** resurfacing event and **Water Board (demo)** request **DG-101**, scheduled for **1–8 December 2026**.
-3. Select **New dig request** in Planned work. Market Road is checked; additional streets can be added. Choose **Coastal Telecom (demo)**, enter a purpose and **1–4 December 2026**.
-4. The warnings identify the resurfacing date and the other agency, shared street, request ID and actual overlapping dates. Select **Inspect DG-101**, then **Return to draft**. Every field remains intact.
-5. Submit, switch the demo role to **Coordinator**, and select **View DG-103** in Planned work. Approve it or reject it with a reason. The map, registry and street record update together. Approval retains advisory warnings and never creates a completed excavation event.
-6. On a phone, switch to **Kollam** and select a street. The record opens in a scrollable sheet. Close it or press Escape to return focus to the registry row or map segment that opened it.
+The registry, municipality/type/status/search filters, point map, detail cards, monthly maintenance chart, project progress, dependencies and featured cases use the root JSON file. Counts come from the loaded arrays. The supplied 27 November 2026 snapshot has 599 maintenance incidents (353 Karunagappally, 246 Kollam), 5 project snapshots, 15 official observations and 8 dependencies.
 
-Street selection preserves area, search and layer settings. Registry search also matches agency names and request IDs/purposes, returning the streets affected by those records. Five labeled, patterned utility layers can be toggled independently. Pink is an outer selection casing, so the individual utility lines remain visible.
+Click a registry record or maintenance point to inspect original source fields, URLs, source dates, quality notes and unknown values. Featured evidence opens `kwa-1572397` (Manoothara junction) and `KL-KOLLAM-6545` (recorded government cancellation), among other cases. Summary cards and charts follow the municipality; the registry and map also follow text, record type and status filters. Candidate cross-source links retain confidence and budget handling; records are never merged and amounts are never summed.
 
-## Data and rules
+The map fits actual maintenance coordinates with north up and longitude/latitude axes. 595 records have source coordinates; four remain unmapped. Boundary exceptions are amber. Points can overlap; the registry retains every record. There are no invented road lines, underground networks or project alignments. Complaint and closure dates are not excavation/restoration dates. The 12-month chart counts source complaint/closure dates independently, so one record can appear in different months.
 
-Only the two area names identify real places. All street alignments, underground layouts, depths, demo agencies, requests and work events are simulated. The visible snapshot is fixed at **26 November 2026** so the demonstration remains repeatable. The 12-month strip covers December 2025 through November 2026 and is derived from recorded events up to that snapshot. Older work remains in the event list. Future requests are always separate from completed events.
+Optional GeoJSON files are resolved at the exact paths in `layers`. Put those files under the project root to enable boundary, roads and waterways layers with supplied attribution and licence. The maintenance point layer joins by `incident_no`, retaining GeoJSON longitude/latitude order. All seven optional files are absent from this checkout; the app explains each unavailable layer and uses the supplied JSON coordinates. Missing or invalid root JSON displays a loading error without samples; a valid empty dataset displays empty states.
 
-Warnings use the original rules: inclusive overlapping dates on a shared street, and resurfacing from 0 through 89 days before the proposed start. Rejected requests do not block other work; a request is excluded from its own overlap check. Other recent excavation is shown in amber in history but does not trigger the reference prototype's broader recent-work warning. A coordinator can approve a request despite advisory warnings. Conflict flags represent overlaps and remain until the overlapping work is rejected or rescheduled; approval alone does not resolve them.
+## Browser data migration
 
-Requests persist under `utilisync.requests.v1` in this browser. Older saved requests without an agency display **Agency unrecorded**. Saved data is validated before loading, including IDs, streets, agencies, dates and review status. Unreadable data falls back to samples with a visible notice; the original stored value is kept until the next save. Unavailable or full storage leaves the session usable and displays a notice. Roles simulate a workflow on one device. Reset demo replaces requests in both areas with the samples.
+The app removes only reserved seed IDs `DG-101` and `DG-102`, or rows explicitly marked with `provenance: demo` or `seed`, from `utilisync.requests.v1`. Other rows are preserved unchanged, shown in Preserved local requests, and excluded from source counts and the map. Rerunning is idempotent. Other storage keys/settings are untouched. Invalid storage remains unchanged with a notice. If storage cannot be written, samples remain hidden for that session and the limitation is shown. New street-based scheduling is unavailable because this dataset supplies no verified street network.
 
-## Check and test
+## Development and verification
 
-Node.js 20 or newer is needed only for development checks:
+- `npm run check`: JavaScript syntax checks. No build or type-check configuration exists.
+- `npm test`: loader, counts, unknowns, migration, optional layers and legacy request logic. Historical demo fixtures and request rules are isolated in `tests/fixtures` and are never served by the app.
+- `npm run test:browser`: Playwright checks the normal entry point, both municipalities, details, filters, source failures, optional layers, storage migration and mobile layout. Use `BROWSER_CHANNEL=msedge` for installed Edge if Chromium is unavailable. Tests intercept responses in isolated browser contexts; the source JSON is never modified. Screenshots are saved under ignored `test-results/`.
 
-```sh
-npm run check
-npm test
-```
-
-The 33 logic tests need no installed dependencies. They cover saved-data validation, legacy agencies, exact shared-street overlap information, unique IDs, dates, the 90-day boundary, linked summaries, individual line counts and completed-event activity buckets.
-
-Install Playwright and Chromium for the 11 browser workflow checks:
-
-```sh
-npm ci
-npx playwright install chromium
-npm run test:browser
-```
-
-Or use installed Microsoft Edge from PowerShell:
-
-```powershell
-$env:BROWSER_CHANNEL = 'msedge'
-npm.cmd run test:browser
-```
-
-Use `npm.cmd` and `npx.cmd` if PowerShell blocks `.ps1` wrappers. Tests use isolated profiles and a temporary local server; they do not change normal browser data. They cover the acceptance flow, preserved drafts, agency validation and migration, review and persistence, linked keyboard selection, all utility layers, unavailable storage, literal text rendering, phone sheets and local-file startup. Visual QA screenshots are saved under ignored `test-results/`.
-
-## Customize
-
-- `demo.js`: snapshot date, agency names, geometry, individual utility lines, completed work events and seed requests. A street has `name`, `points`, `lines` and `events`. Each line has a unique `id`, `type`, `agency`, `depth` in metres, `confidence` and `lastTouched`. Each event has a `date`, `type` (`excavation` or `resurfacing`), `agency` and `purpose`. Keep future plans in requests, not completed events.
-- Utility keys are `water`, `power`, `fibre`, `sewer` and `gas`. The existing `fibre` key is preserved and presented as **Telecom**. Edit line types in `demo.js`; each line is drawn independently. Dash patterns live with the utility definitions; colors live in `theme.css`.
-- `requests.js`: saved-data validation, ID generation, structured coordination warnings and shared street summaries/activity. The `conflicts()` text API remains available.
-- `theme.css`: survey palette, spacing, focus treatments, line colors and responsive layout.
-- `index.html`: workspace and form structure. `map.js`: selectable schematic segments. `app.js`: linked selection, street records, forms, review dialogs and local persistence.
-
-The desktop reference project is consulted for registry and history structure only and remains unchanged.
+`data.js` owns validation/adaptation and storage migration; `app.js` renders source evidence; `map.js` draws geographical points/optional geometry; `server.cjs` serves only application assets and optional GeoJSON. Update `project_data.json` to replace the snapshot without embedding or duplicating it in JavaScript.

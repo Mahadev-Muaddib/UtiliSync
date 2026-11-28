@@ -2,11 +2,12 @@
   "name": "utilisync",
   "version": "1.0.0",
   "private": true,
-  "description": "A local, fictional municipal utility coordination demo",
+  "description": "Municipal maintenance and project evidence from project_data.json",
   "scripts": {
-    "test": "node --test tests/requests.test.cjs",
+    "test": "node --test tests/requests.test.cjs tests/data.test.cjs",
     "test:browser": "node --test tests/browser.test.cjs",
-    "check": "node --check demo.js && node --check requests.js && node --check map.js && node --check app.js"
+    "check": "node --check data.js && node --check map.js && node --check app.js && node --check server.cjs",
+    "start": "node server.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"
