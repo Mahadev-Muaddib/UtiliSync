@@ -8,7 +8,8 @@
     return Number.isFinite(lon) && Number.isFinite(lat) && Math.abs(lon) <= 180 && Math.abs(lat) <= 90 ? [lon, lat] : null;
   }
   function validate(data) {
-    if (!data || data.schema_version !== '1.0.0' || !/^\d{4}-\d{2}-\d{2}$/.test(data.snapshot_date)) throw Error('Unsupported schema or missing snapshot date.');
+    if (!data || data.schema_version !== '1.0.0' || !/^\d{4}-\d{2}-\d{2}$/.test(data.snapshot_date)
+      || !Number.isFinite(Date.parse(data.snapshot_date)) || new Date(data.snapshot_date).toISOString().slice(0, 10) !== data.snapshot_date) throw Error('Unsupported schema or invalid snapshot date.');
     for (const key of required) if (!Array.isArray(data[key])) throw Error(key + ' must be an array.');
     const records = [], byId = new Map();
     for (const collection of collections) for (const raw of data[collection]) {
@@ -16,6 +17,9 @@
       if (!Object.hasOwn(municipalities, raw.municipality_key)) throw Error('Unknown municipality_key on ' + raw.record_id + '.');
       if (collection === 'maintenance_incidents' && (typeof raw.incident_no !== 'string' || !raw.incident_no)) throw Error('Missing incident_no on ' + raw.record_id + '.');
       if (collection === 'water_projects' && typeof raw.project_id !== 'string') throw Error('Missing project_id on ' + raw.record_id + '.');
+      for (const field of ['landmark', 'title', 'work', 'status_reported', 'status', 'complaint_date_raw', 'closed_date_raw', 'latest_status_date', 'status_effective_date', 'publication_date']) {
+        if (raw[field] != null && typeof raw[field] !== 'string') throw Error('Invalid ' + field + ' on ' + raw.record_id + '.');
+      }
       for (const field of ['longitude', 'latitude', 'progress_percent_reported']) if (raw[field] != null && !Number.isFinite(raw[field])) throw Error('Invalid ' + field + ' on ' + raw.record_id + '.');
       if (raw.progress_percent_reported != null && (raw.progress_percent_reported < 0 || raw.progress_percent_reported > 100)) throw Error('Invalid progress on ' + raw.record_id + '.');
       if (raw.longitude != null && raw.latitude != null && !point(raw.longitude, raw.latitude)) throw Error('Invalid coordinates on ' + raw.record_id + '.');
