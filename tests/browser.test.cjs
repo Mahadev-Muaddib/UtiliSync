@@ -28,7 +28,7 @@ test('fresh launch reconciles all source counts and map points, with no runtime 
   assert.equal(await page.locator('.boundary-exception').count(), 42); assert.equal(await page.locator('#layers .layer-item').count(), 7);
   assert.doesNotMatch(await page.locator('#content').innerText(), /Water Board \(demo\)|DG-101|DG-102/);
   assert.deepEqual(await page.locator('#results button').evaluateAll(nodes => nodes.map(n => n.dataset.recordId)), [...source.maintenance_incidents, ...source.water_projects, ...source.official_work_observations].map(r => r.record_id));
-  assert.deepEqual(await page.locator('script[src]').evaluateAll(nodes => nodes.map(n => n.getAttribute('src'))), ['data.js', 'map.js', 'app.js']);
+  assert.deepEqual(await page.locator('script[src]').evaluateAll(nodes => nodes.map(n => n.getAttribute('src'))), ['data.js', 'map.js', 'beta-logic.js', 'beta.js', 'app.js']);
   await page.screenshot({ path: 'test-results/real-data-desktop.png' });
 });
 test('both municipalities, type, text and status filters stay linked to map and registry', async t => {
@@ -89,7 +89,7 @@ test('unavailable browser storage does not block actual source data', async t =>
 test('disposable app copy handles missing and invalid files then recovers with the real snapshot', async t => {
   const root = path.resolve(__dirname, '..');
   const copy = await mkdtemp(path.join(root, 'test-results', 'source-failure-'));
-  for (const file of ['index.html', 'theme.css', 'data.js', 'map.js', 'app.js', 'server.cjs', 'project_data.json']) await copyFile(path.join(root, file), path.join(copy, file));
+  for (const file of ['index.html', 'theme.css', 'data.js', 'map.js', 'beta-logic.js', 'beta.js', 'app.js', 'server.cjs', 'project_data.json']) await copyFile(path.join(root, file), path.join(copy, file));
   const isolated = require(path.join(copy, 'server.cjs')).createServer();
   await new Promise(resolve => isolated.listen(0, '127.0.0.1', resolve));
   const page = await browser.newPage();
@@ -105,4 +105,61 @@ test('disposable app copy handles missing and invalid files then recovers with t
   assert.equal(await page.locator('#results button').count(), 0);
   await copyFile(path.join(root, 'project_data.json'), path.join(copy, 'project_data.json'));
   await page.reload(); await page.locator('#content').waitFor(); assert.deepEqual(await counts(page), ['599', '5', '15', '8']);
+});
+
+async function openBeta(page) {
+  // Isolate the external tile service; Leaflet and all interactions are real local assets.
+  await page.route('https://tile.openstreetmap.org/**', route => route.abort());
+  await page.locator('#beta-playground > summary').click();
+  await page.locator('#beta-map.leaflet-container').waitFor();
+  await page.locator('#beta-load-status').filter({ hasText: 'BETA ready' }).waitFor();
+}
+test('BETA is optional and lazy; source marker selection preserves coordinates and opens original details', async t => {
+  const page = await pageFor(t); assert.equal(await page.locator('#beta-playground').getAttribute('open'), null);
+  assert.equal(await page.locator('script[src="vendor/leaflet.js"]').count(), 0);
+  await openBeta(page); assert.equal(await page.locator('#beta-map [data-source-id]').count(), source.maintenance_incidents.filter(r => r.municipality_key === 'karunagappally' && r.latitude != null && r.longitude != null).length);
+  const marker = page.locator('#beta-map [data-source-id="kwa-1572397"]'); await marker.focus(); await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#beta-form [name=latitude]').inputValue(), '9.0581791');
+  assert.equal(await page.locator('#beta-form [name=longitude]').inputValue(), '76.5135328');
+  assert.match(await page.locator('.leaflet-popup').innerText(), /Manoothara junction/);
+  assert.match(await page.locator('.leaflet-popup').innerText(), /SOURCE RECORD/);
+  await page.getByRole('button', { name: 'Open full source details' }).click(); assert.match(await page.locator('#details').innerText(), /Manoothara junction/);
+  assert.deepEqual(await counts(page), ['599', '5', '15', '8']);
+  await page.locator('#beta-area').selectOption('kollam'); assert.equal(await page.locator('#beta-map [data-source-id]').count(), source.maintenance_incidents.filter(r => r.municipality_key === 'kollam' && r.latitude != null && r.longitude != null).length);
+});
+test('BETA map click sets coordinates; mock submission, overlap review and clear never change source data', async t => {
+  const page = await pageFor(t); await openBeta(page);
+  await page.locator('#beta-map').click({ position: { x: 100, y: 100 } });
+  assert.ok(Number(await page.locator('#beta-form [name=latitude]').inputValue()) > 9);
+  assert.ok(Number(await page.locator('#beta-form [name=longitude]').inputValue()) > 76);
+  await page.locator('#beta-landmark').selectOption('kwa-1572397');
+  await page.locator('#beta-form [name=agency]').fill('Test water crew'); await page.locator('#beta-form [name=purpose]').fill('<b>Test only</b>');
+  await page.locator('#beta-form [name=start]').fill('2026-12-04'); await page.locator('#beta-form [name=end]').fill('2026-12-01');
+  await page.getByRole('button', { name: 'Submit mock request', exact: true }).click(); assert.match(await page.locator('#beta-warnings').innerText(), /End date/);
+  assert.equal(await page.locator('.beta-request').count(), 0);
+  await page.locator('#beta-form [name=end]').fill('2026-12-08'); await page.getByRole('button', { name: 'Submit mock request', exact: true }).click();
+  assert.equal(await page.locator('.beta-request').count(), 1); assert.equal(await page.locator('.beta-request h3 b').count(), 0);
+  await page.getByRole('button', { name: 'Submit mock request', exact: true }).click(); assert.match(await page.locator('#beta-warnings').innerText(), /Simulated overlap/);
+  await page.locator('[data-mock-id="BETA-1"]').getByRole('button', { name: 'Simulate approval' }).click();
+  assert.match(await page.locator('[data-mock-id="BETA-1"]').innerText(), /Approved[\s\S]*Simulated overlaps/);
+  await page.locator('[data-mock-id="BETA-2"]').getByRole('button', { name: 'Simulate rejection' }).click();
+  assert.doesNotMatch(await page.locator('[data-mock-id="BETA-1"]').innerText(), /Simulated overlaps/);
+  assert.deepEqual(await counts(page), ['599', '5', '15', '8']); assert.equal(await page.evaluate(() => localStorage.getItem('utilisync.requests.v1')), null);
+  await page.getByRole('button', { name: 'Clear all test requests' }).click(); assert.equal(await page.locator('.beta-request').count(), 0);
+  await page.locator('#beta-sample').click(); assert.equal(await page.locator('.beta-request').count(), 2);
+  await page.locator('#beta-playground').screenshot({ path: 'test-results/beta-desktop.png' });
+  await page.reload(); await page.locator('#content').waitFor(); await openBeta(page); assert.equal(await page.locator('.beta-request').count(), 0);
+});
+test('BETA handles unavailable Leaflet assets and retry without affecting real records', async t => {
+  const page = await pageFor(t); await page.route('**/vendor/leaflet.js', route => route.fulfill({ status: 404, body: '' }));
+  await page.locator('#beta-playground > summary').click(); await page.locator('#beta-retry').waitFor();
+  assert.match(await page.locator('#beta-load-status').innerText(), /Leaflet assets unavailable/); assert.deepEqual(await counts(page), ['599', '5', '15', '8']);
+  await page.unroute('**/vendor/leaflet.js'); await page.route('https://tile.openstreetmap.org/**', route => route.abort()); await page.locator('#beta-retry').click();
+  await page.locator('#beta-map.leaflet-container').waitFor(); assert.match(await page.locator('#beta-tile-status').innerText(), /map tiles|Map background/);
+});
+test('BETA fits phone layout and keeps session requests when collapsed and reopened', async t => {
+  const page = await pageFor(t, { mobile: true }); await openBeta(page); await page.locator('#beta-sample').click();
+  await page.locator('#beta-playground > summary').click(); await page.locator('#beta-playground > summary').click();
+  assert.equal(await page.locator('.beta-request').count(), 2); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await page.locator('#beta-playground').screenshot({ path: 'test-results/beta-mobile.png' });
 });

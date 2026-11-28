@@ -187,5 +187,6 @@ async function start() {
   byId('area').onchange = render; byId('kind').onchange = render; byId('record-status').onchange = render; byId('search').oninput = () => { if (!filteredRecords().some(r => r.id === selected)) selected = ''; renderRegistry(); renderMap(); renderDetails(); };
   byId('clear').onclick = () => { byId('search').value = ''; byId('kind').value = 'all'; byId('record-status').value = 'all'; render(); };
   byId('fit-map').onclick = renderMap; render(); renderLocal();
+  BetaDig.init(dataset.records, dataset.snapshot_date, navigateRecord);
 }
 start();

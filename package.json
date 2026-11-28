@@ -4,9 +4,9 @@
   "private": true,
   "description": "Municipal maintenance and project evidence from project_data.json",
   "scripts": {
-    "test": "node --test tests/requests.test.cjs tests/data.test.cjs",
+    "test": "node --test tests/requests.test.cjs tests/data.test.cjs tests/beta.test.cjs",
     "test:browser": "node --test tests/browser.test.cjs",
-    "check": "node --check data.js && node --check map.js && node --check app.js && node --check server.cjs",
+    "check": "node --check data.js && node --check map.js && node --check app.js && node --check beta-logic.js && node --check beta.js && node --check server.cjs",
     "start": "node server.cjs"
   },
   "devDependencies": {
@@ -14,5 +14,8 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "leaflet": "1.9.4"
   }
 }

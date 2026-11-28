@@ -20,7 +20,32 @@
 <section class="chart-panel"><h2>Documented dependencies</h2><p class="muted">Prerequisite → dependent · historical planning evidence, not spatial overlap</p><div id="dependencies"></div></section>
 <section class="chart-panel"><h2>Featured evidence</h2><div id="featured" class="featured-grid"></div></section>
 <section class="chart-panel"><h2>Preserved local requests</h2><p class="muted">User-created records from the previous app are kept separately from the source dataset. There is no verified street network for new dig scheduling.</p><div id="local-requests"></div></section>
+<details id="beta-playground" class="chart-panel beta-panel">
+<summary><span class="beta-badge">BETA</span> Dig-request playground <span class="muted">Optional · mock testing</span></summary>
+<div class="beta-intro"><h2>Try a dig request on the map</h2><p>Place a test location, set dates and simulate a review. All requests and work zones here are fictional, last only for this page session, and stay outside the source registry.</p></div>
+<p id="beta-load-status" role="status">Open this panel to load the Leaflet map.</p>
+<button id="beta-retry" type="button" hidden>Retry map</button>
+<div id="beta-workspace" hidden>
+<div class="beta-toolbar"><label>Test municipality <select id="beta-area"><option value="karunagappally">Karunagappally</option><option value="kollam">Kollam</option></select></label><button id="beta-fit" type="button">Fit test area</button><button id="beta-reset" type="button">Clear all test requests</button></div>
+<div class="beta-grid">
+<div><div id="beta-map" role="region" aria-label="BETA Leaflet mock dig request map"></div><p id="beta-tile-status" class="muted" role="status">Map background: OpenStreetMap. An internet connection is needed for map tiles.</p><p class="muted beta-legend">Blue dots: source records · Pink: draft zone · Purple: mock request · Amber: simulated overlap · Grey: rejected test</p><p class="muted">Click the map to set latitude and longitude, or select a source marker to view details. Only records with supplied coordinates are marked; projects without coordinates remain unplaced. Larger circles represent fictional test zones.</p></div>
+<form id="beta-form" class="beta-form">
+<h3>Mock dig request</h3>
+<label>Reference landmark <select id="beta-landmark"><option value="">Choose a source landmark (optional)</option></select></label>
+<p class="muted">Landmarks supply a reference point only; selecting one does not create a real work record.</p>
+<label>Test agency <input name="agency" maxlength="100" required placeholder="e.g. Test water crew"></label>
+<label>Purpose <input name="purpose" maxlength="200" required placeholder="e.g. Simulate a connection repair"></label>
+<div class="beta-field-pair"><label>Latitude <input name="latitude" type="number" step="any" min="-85" max="85" required></label><label>Longitude <input name="longitude" type="number" step="any" min="-180" max="180" required></label></div>
+<div class="beta-field-pair"><label>Start date <input name="start" type="date" required></label><label>End date <input name="end" type="date" required></label></div>
+<label>Test zone radius (metres) <input name="radius" type="number" min="10" max="500" step="1" value="50" required></label>
+<div id="beta-warnings" class="beta-warnings" role="status">Set a location and dates to check simulated overlaps.</div>
+<p class="muted">The test flags intersecting circles with overlapping dates, including shared start/end days. It does not assess real excavation safety or permissions.</p>
+<button type="submit" class="beta-primary">Submit mock request</button><button id="beta-sample" type="button">Add example overlap</button>
+</form></div>
+<div class="panel-heading beta-list-heading"><h3>Test requests</h3><span id="beta-count" class="count">0 mock requests</span></div>
+<p id="beta-action-status" role="status" tabindex="-1"></p><div id="beta-requests" class="beta-requests"></div>
+</div></details>
 <footer>UtiliSync / Source evidence workspace · Unknown dates, routes and costs are never inferred.</footer>
 </div>
-</main><script defer src="data.js"></script><script defer src="map.js"></script><script defer src="app.js"></script>
+</main><script defer src="data.js"></script><script defer src="map.js"></script><script defer src="beta-logic.js"></script><script defer src="beta.js"></script><script defer src="app.js"></script>
 </body></html>

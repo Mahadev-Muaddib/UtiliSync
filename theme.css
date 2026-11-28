@@ -11,3 +11,32 @@ header { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; padding:1
 @media(max-width:760px) { main { padding:1.25rem 4vw; } header { padding:1rem 4vw; gap:.6rem; } .header-caption { font-size:.8rem; } header label { width:100%; justify-content:space-between; } header select { max-width:65%; } .heading { display:block; } .snapshot { text-align:left; margin-top:1rem; } .stats { grid-template-columns:repeat(2,1fr); gap:.65rem; } .stat { padding:.8rem; } .filters { display:grid; grid-template-columns:1fr 1fr; gap:.65rem; } .filters label:first-child { grid-column:1/-1; } .filters select { width:100%; } .workspace { display:flex; flex-direction:column-reverse; } .registry,.atlas { width:100%; } #results { max-height:370px; } .bar { padding:1rem; } .bar h2 { font-size:1.1rem; } .bar button { font-size:.875rem; } #details { padding:1rem; } .record-heading { flex-direction:column; } .record-heading .pill { max-width:100%; } .facts,.raw-fields,.featured-grid { grid-template-columns:1fr; } .dependency-chain { flex-direction:column; align-items:stretch; } .connector { text-align:center; transform:rotate(90deg); } .chart-panel { padding:1rem; } .month-bars span { font-size:10px; } .month-label { font-size:10px; } }
 
 @media(max-width:760px) { .month-bars span { display:none; } .month-label { font-size:.75rem; } }
+
+/* Optional BETA playground; real source surfaces keep their existing styles. */
+.beta-panel { border-top:3px solid #7850b4; margin-top:2rem; }
+.beta-panel > summary { display:list-item; font-size:1.15rem; }
+.beta-panel > summary .muted { margin-left:.6rem; font-weight:400; }
+.beta-badge { display:inline-block; color:#5b358f; background:#f0e8fc; border:1px solid #cbb4eb; border-radius:4px; padding:.1rem .45rem; margin-right:.45rem; font-size:.75rem; letter-spacing:.08em; vertical-align:middle; }
+.beta-intro { margin:1.3rem 0 1rem; max-width:900px; } .beta-intro p { margin-top:.5rem; color:var(--muted); }
+#beta-load-status { margin:.75rem 0; font-size:.875rem; }
+.beta-toolbar { display:flex; flex-wrap:wrap; align-items:end; gap:.75rem; margin:1rem 0; }
+.beta-toolbar label,.beta-form label { display:grid; gap:.3rem; font-size:.875rem; font-weight:600; }
+.beta-toolbar button:last-child { margin-left:auto; }
+.beta-grid { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr); gap:1.25rem; }
+#beta-map { height:540px; border:1px solid var(--line); border-radius:6px; background:#edf2f5; isolation:isolate; font-family:inherit; }
+#beta-map .leaflet-control-attribution { font-size:11px; } #beta-map .leaflet-interactive:focus { outline:3px solid var(--accent); }
+.beta-grid > div > p { margin:.6rem 0; }
+.beta-form { display:flex; flex-direction:column; gap:.7rem; padding:1rem; background:#f5f2fa; border:1px solid #ddd3eb; border-radius:6px; }
+.beta-form h3 { margin:0; } .beta-form input,.beta-form select { width:100%; }
+.beta-field-pair { display:grid; grid-template-columns:1fr 1fr; gap:.65rem; }
+.beta-field-pair label { min-width:0; }
+.beta-warnings { padding:.75rem; background:#fff8e9; border-left:3px solid #b87513; font-size:.875rem; }
+.beta-warnings p + p { margin-top:.5rem; }
+.beta-primary { background:#654094; border-color:#654094; color:white; } .beta-primary:hover { background:#513078; color:white; }
+.beta-list-heading { margin:1.5rem 0 .5rem; } .beta-list-heading h3 { margin:0; }
+.beta-requests { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin-top:1rem; }
+.beta-request { padding:1rem; border:1px solid #ddd3eb; border-radius:6px; overflow-wrap:anywhere; } .beta-request h3 { margin:.4rem 0; } .beta-request > strong { color:#654094; font-size:.875rem; }
+.beta-request-actions { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.8rem; } .beta-request-actions button { font-size:.875rem; }
+.beta-popup { overflow-wrap:anywhere; } .beta-popup h3 { margin:.4rem 0; font-size:1rem; } .beta-popup button { display:block; margin:.5rem 0; font-size:.875rem; } .beta-popup strong { color:#654094; }
+@media(max-width:900px) { .beta-grid { grid-template-columns:1fr; } #beta-map { height:400px; } }
+@media(max-width:600px) { .beta-requests { grid-template-columns:1fr; } .beta-toolbar button:last-child { margin-left:0; } .beta-toolbar label { width:100%; } .beta-panel > summary .muted { display:block; margin:.5rem 0 0; } .beta-list-heading { align-items:start; flex-direction:column; } }
